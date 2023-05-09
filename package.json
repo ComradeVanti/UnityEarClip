@@ -1,0 +1,21 @@
+{
+  "name": "dev.comradevanti.ear-clip",
+  "version": "0.1.0",
+  "description": "Ear-clipping algorithms for triangulating 2D polygons",
+  "displayName": "Ear-clip",
+  "unity": "2021.3",
+  "author": {
+    "name": "ComradeVanti",
+    "url": "https://github.com/ComradeVanti"
+  },
+  "keywords": [
+    "geometry",
+    "polygon",
+    "triangulate",
+    "ear-clip"
+  ],
+  "license": "Unlicense",
+  "publishConfig": {
+    "registry": "https://package.openupm.com"
+  }
+}
