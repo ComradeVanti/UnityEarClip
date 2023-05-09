@@ -15,6 +15,7 @@
     "ear-clip"
   ],
   "license": "Unlicense",
+  "changelogUrl": "https://github.com/ComradeVanti/UnityEarClip/blob/main/CHANGELOG.md",
   "publishConfig": {
     "registry": "https://package.openupm.com"
   }
