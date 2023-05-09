@@ -3,6 +3,8 @@
 Super lightweight ear-clipping 2D polygon triangulation package for Unity.
 Can only handle [simple](https://en.wikipedia.org/wiki/Simple_polygon) polygons.
 
+[Changelog](./CHANGELOG.md)
+
 ## Usage
 
 ```csharp
