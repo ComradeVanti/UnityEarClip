@@ -1,0 +1,14 @@
+{
+    "name": "Dev.ComradeVanti.EarClip",
+    "rootNamespace": "Dev.ComradeVanti.EarClip",
+    "references": [],
+    "includePlatforms": [],
+    "excludePlatforms": [],
+    "allowUnsafeCode": false,
+    "overrideReferences": false,
+    "precompiledReferences": [],
+    "autoReferenced": true,
+    "defineConstraints": [],
+    "versionDefines": [],
+    "noEngineReferences": false
+}
