@@ -6,6 +6,10 @@ to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
 ## Upcoming
 
+### Added
+
+- Sort arbitrary data clockwise
+
 ## 1.0.1
 
 ### Fixed

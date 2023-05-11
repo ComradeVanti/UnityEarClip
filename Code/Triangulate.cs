@@ -1,4 +1,5 @@
-﻿using System.Collections.Generic;
+﻿using System;
+using System.Collections.Generic;
 using System.Linq;
 using UnityEngine;
 
@@ -33,12 +34,23 @@ namespace Dev.ComradeVanti.EarClip
             c = triangle.C;
         }
 
+        private static float Orientation(Vector2 a, Vector2 b, Vector2 c)
+        {
+            var ((x1, y1), (x2, y2), (x3, y3)) = (a, b, c);
+            return (y2 - y1) * (x3 - x2) - (y3 - y2) * (x2 - x1);
+        }
+
+        public static IEnumerable<T> Clockwise<T>(this IEnumerable<T> items, Func<T, Vector2> selector)
+        {
+            var array = items.ToArray();
+            var points = array.Take(3).Select(selector).ToArray();
+            var (a, b, c) = (points[0], points[1], points[2]);
+            return Orientation(a, b, c) >= 0 ? array : array.Reverse();
+        }
+
         public static IEnumerable<Vector2> Clockwise(this IEnumerable<Vector2> points)
         {
-            var array = points.ToArray();
-            var ((x1, y1), (x2, y2), (x3, y3)) = (array[0], array[1], array[2]);
-            var isClockwise = (y2 - y1) * (x3 - x2) - (y3 - y2) * (x2 - x1) >= 0;
-            return isClockwise ? array : array.Reverse();
+            return Clockwise(points, it => it);
         }
 
         private static float Cross2D(Vector2 a, Vector2 b) =>
