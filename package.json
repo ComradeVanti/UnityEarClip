@@ -1,6 +1,6 @@
 {
   "name": "dev.comradevanti.ear-clip",
-  "version": "1.0.1",
+  "version": "1.0.2",
   "description": "Ear-clipping algorithms for triangulating 2D polygons",
   "displayName": "Ear-clip",
   "unity": "2021.3",
