@@ -6,6 +6,10 @@ to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
 ## Upcoming
 
+### Fixed
+
+- Invalid reflex vertex calculation
+
 ## 1.0.0
 
 ### Added

@@ -72,16 +72,18 @@ namespace Dev.ComradeVanti.EarClip
 
             float AngleAt(int index)
             {
-                var (edge1, edge2) =
-                    (EdgeBetween(index, Prev(index)), EdgeBetween(index, Next(index)));
-                var dot = Vector2.Dot(edge1.normalized, edge2.normalized);
-                return Mathf.Acos(dot);
+                var (a, b) = (
+                    EdgeBetween(index, Prev(index)).normalized,
+                    EdgeBetween(index, Next(index)).normalized);
+
+                var cross = a.x * b.y - a.y * b.x;
+                return Mathf.Atan2(cross, Vector2.Dot(a, b));
             }
 
-            bool IsConvex(int index)
+            bool IsReflex(int index)
             {
                 var angle = AngleAt(index);
-                return angle < Mathf.PI;
+                return angle is >= Mathf.PI or < 0;
             }
 
             var convexIndices = allIndices.Where(IsConvex).ToList();
