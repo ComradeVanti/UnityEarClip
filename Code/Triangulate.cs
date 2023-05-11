@@ -1,5 +1,4 @@
-﻿using System;
-using System.Collections.Generic;
+﻿using System.Collections.Generic;
 using System.Linq;
 using UnityEngine;
 
@@ -42,8 +41,53 @@ namespace Dev.ComradeVanti.EarClip
             return isClockwise ? array : array.Reverse();
         }
 
+        private static float Cross2D(Vector2 a, Vector2 b) =>
+            a.x * b.y - a.y * b.x;
+
+        private static bool Intersects(Vector2 a1, Vector2 b1, Vector2 a2, Vector2 b2)
+        {
+            // https://ideone.com/PnPJgb
+            Vector2 CmP = new Vector2(a2.x - a1.x, a2.y - a1.y);
+            Vector2 r = new Vector2(b1.x - a1.x, b1.y - a1.y);
+            Vector2 s = new Vector2(b2.x - a2.x, b2.y - a2.y);
+
+            float CmPxr = CmP.x * r.y - CmP.y * r.x;
+            float CmPxs = CmP.x * s.y - CmP.y * s.x;
+            float rxs = r.x * s.y - r.y * s.x;
+
+            if (CmPxr == 0f)
+            {
+                // Lines are collinear, and so intersect if they have any overlap
+
+                return ((a2.x - a1.x < 0f) != (a2.x - b1.x < 0f))
+                       || ((a2.y - a1.y < 0f) != (a2.y - b1.y < 0f));
+            }
+
+            if (rxs == 0f)
+                return false; // Lines are parallel.
+
+            float rxsr = 1f / rxs;
+            float t = CmPxs * rxsr;
+            float u = CmPxr * rxsr;
+
+            return (t > 0f) && (t < 1f) && (u > 0f) && (u < 1f);
+        }
+
+        public static Vector2 MidPoint(Vector2 a, Vector2 b)
+        {
+            return Vector2.Lerp(a, b, 0.5f);
+        }
+
         public static IEnumerable<int> ConcaveNoHoles(IReadOnlyList<Vector2> vertices)
         {
+            if (vertices.Count == 3)
+            {
+                yield return 0;
+                yield return 1;
+                yield return 2;
+                yield break;
+            }
+
             var vertexCount = vertices.Count;
             var allIndices = Enumerable.Range(0, vertexCount).ToList();
 
@@ -64,6 +108,11 @@ namespace Dev.ComradeVanti.EarClip
             Vector2 VertexAt(int index) =>
                 vertices[index];
 
+            var segments = allIndices
+                .Select(i => (VertexAt(i), VertexAt(Next(i))))
+                .ToArray();
+            var infx = vertices.Max(it => it.x) + 1;
+
             Vector2 EdgeBetween(int a, int b) =>
                 VertexAt(b) - VertexAt(a);
 
@@ -76,8 +125,7 @@ namespace Dev.ComradeVanti.EarClip
                     EdgeBetween(index, Prev(index)).normalized,
                     EdgeBetween(index, Next(index)).normalized);
 
-                var cross = a.x * b.y - a.y * b.x;
-                return Mathf.Atan2(cross, Vector2.Dot(a, b));
+                return Mathf.Atan2(Cross2D(a, b), Vector2.Dot(a, b));
             }
 
             bool IsReflex(int index)
@@ -86,11 +134,33 @@ namespace Dev.ComradeVanti.EarClip
                 return angle is >= Mathf.PI or < 0;
             }
 
+            bool IsDiagonal(Vector2 a, Vector2 b)
+            {
+                var intersections = 0;
+
+                foreach (var (a2, b2) in segments)
+                {
+                    if (!(a == a2 || a == b2 || b == a2 || b == b2) && Intersects(a, b, a2, b2)) return false;
+                    var midPoint = MidPoint(a, b);
+                    var infPoint = new Vector2(infx, midPoint.y);
+
+                    if (Intersects(midPoint, infPoint, a2, b2))
+                        intersections++;
+                }
+
+                return intersections % 2 == 1;
+            }
+
+            bool IsConvex(int index)
+            {
+                var reflex = IsReflex(index);
+                var diagonal = IsDiagonal(
+                    VertexAt(Prev(index)),
+                    VertexAt(Next(index)));
+                return !reflex && diagonal;
+            }
+
             var convexIndices = allIndices.Where(IsConvex).ToList();
-
-            bool IsReflex(int index) =>
-                !IsConvex(index);
-
             var reflexIndices = allIndices.Where(IsReflex).ToList();
 
             bool Contains(Triangle triangle, int index)
@@ -113,7 +183,15 @@ namespace Dev.ComradeVanti.EarClip
             bool IsEar(int index)
             {
                 var triangle = TriangleWithTip(index);
-                return !reflexIndices.Any(i => Contains(triangle, i));
+
+                bool IsPartOfTriangle(int i)
+                {
+                    return i == triangle.A || i == triangle.B || i == triangle.C;
+                }
+
+                return !reflexIndices
+                    .Where(i => !IsPartOfTriangle(i))
+                    .Any(i => Contains(triangle, i));
             }
 
             var earIndices = convexIndices.Where(IsEar).ToList();

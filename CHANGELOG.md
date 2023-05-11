@@ -9,6 +9,7 @@ to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 ### Fixed
 
 - Invalid reflex vertex calculation
+- Handle fake-convex vertices
 
 ## 1.0.0
 
